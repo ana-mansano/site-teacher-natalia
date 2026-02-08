@@ -1,0 +1,161 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --rosa-claro: #F8B6B0;
+  --rosa-suave: #FAD0CB;
+  --marrom-escuro: #4A2E1F;
+  --marrom-medio: #6B4A3A;
+  --off-white: #F6F1EB;
+  --rosa-destaque: #E96C6C;
+  --azul-escuro: #1e3a5f;
+  --azul-medio: #2c4a6f;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--off-white);
+  color: var(--marrom-escuro);
+}
+
+/* Margem para scroll com header fixo (evita seção ficar atrás do header) */
+section {
+  scroll-margin-top: 5rem;
+}
+
+/* Botões com hover amigável */
+.btn-primary {
+  @apply px-6 py-3 rounded-2xl font-medium transition-all duration-200;
+  background-color: var(--rosa-destaque);
+  color: var(--off-white);
+}
+.btn-primary:hover {
+  filter: brightness(1.08);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(233, 108, 108, 0.35);
+}
+
+/* Cards do quiz com sensação de “escolha”, não formulário */
+.quiz-option {
+  @apply cursor-pointer rounded-2xl p-4 transition-all duration-200 border-2;
+  border-color: var(--rosa-suave);
+  background: white;
+}
+.quiz-option:hover {
+  border-color: var(--rosa-destaque);
+  background: var(--rosa-suave);
+  transform: translateY(-2px);
+}
+.quiz-option.selected {
+  border-color: var(--rosa-destaque);
+  background: var(--rosa-suave);
+  box-shadow: 0 4px 12px rgba(233, 108, 108, 0.2);
+}
+
+.quiz-option:focus-visible,
+.btn-primary:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--rosa-destaque);
+  outline-offset: 2px;
+}
+
+/* Animação suave de entrada do hero */
+@keyframes heroFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* both = backwards (mostra 0% durante o delay) + forwards (mantém 100% no fim) */
+.hero-animate {
+  animation: heroFadeIn 0.7s ease-out both;
+}
+
+.hero-animate-delay-1 { animation-delay: 0.1s; }
+.hero-animate-delay-2 { animation-delay: 0.25s; }
+.hero-animate-delay-3 { animation-delay: 0.4s; }
+.hero-animate-delay-4 { animation-delay: 0.55s; }
+.hero-animate-delay-5 { animation-delay: 0.7s; }
+
+/* Leve respiro no CTA */
+@keyframes ctaSoft {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-2px) scale(1.01); }
+}
+
+.cta-breathe {
+  animation: ctaSoft 3s ease-in-out infinite;
+}
+
+/* Quem sou eu: entrada suave ao aparecer na tela */
+@keyframes quemSouEuEntrada {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.quem-sou-eu-animate.quem-sou-eu-visible .quem-sou-eu-content {
+  animation: quemSouEuEntrada 0.8s ease-out forwards;
+}
+.quem-sou-eu-animate .quem-sou-eu-content {
+  opacity: 0;
+}
+.quem-sou-eu-animate.quem-sou-eu-visible .quem-sou-eu-p1 { animation: quemSouEuEntrada 0.7s ease-out 0.15s both; }
+.quem-sou-eu-animate.quem-sou-eu-visible .quem-sou-eu-p2 { animation: quemSouEuEntrada 0.7s ease-out 0.3s both; }
+.quem-sou-eu-animate .quem-sou-eu-p1,
+.quem-sou-eu-animate .quem-sou-eu-p2 { opacity: 0; }
+
+/* Barra fina animada (compatível com todos os navegadores/dispositivos) */
+@keyframes barraDeslize {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+.quem-sou-eu-barra {
+  height: 4px;
+  width: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    #1e3a5f 15%,
+    #E96C6C 35%,
+    #F8B6B0 50%,
+    #2c4a6f 65%,
+    #E96C6C 85%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: barraDeslize 4s linear infinite;
+}
+
+/* Fallback: se prefers-reduced-motion, barra estática */
+@media (prefers-reduced-motion: reduce) {
+  .quem-sou-eu-barra {
+    animation: none;
+    background-size: 100% 100%;
+    background-position: 0 0;
+  }
+}
+
+/* FAQ accordion */
+.faq-item summary {
+  list-style: none;
+  cursor: pointer;
+}
+.faq-item summary::-webkit-details-marker {
+  display: none;
+}
