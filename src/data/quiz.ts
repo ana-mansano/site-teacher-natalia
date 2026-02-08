@@ -54,7 +54,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
     question: "O que é mais importante na relação com a professora?",
     options: [
       { label: "Paciente, que entenda meu ritmo", score: 1 },
-      { label: "Objetiva e que cobré resultado", score: 0.3 },
+      { label: "Objetiva e que cobre resultado", score: 0.3 },
       { label: "Que eu me sinta à vontade para errar", score: 1 },
       { label: "Que adapte o conteúdo ao que eu gosto", score: 0.9 },
     ],

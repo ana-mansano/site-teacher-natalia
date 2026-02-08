@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { QUIZ_QUESTIONS, MATCH_THRESHOLD } from "@/data/quiz";
+import { QUIZ_QUESTIONS } from "@/data/quiz";
 
 type QuizProps = {
   onFinish: (isMatch: boolean) => void;
@@ -27,14 +27,8 @@ export default function Quiz({ onFinish }: QuizProps) {
     if (selectedOption === null) return;
 
     if (isLastQuestion) {
-      const scores = answers.map(
-        (optIdx, i) => QUIZ_QUESTIONS[i].options[optIdx].score
-      );
-
-      const avg =
-        scores.reduce((a, b) => a + b, 0) / QUIZ_QUESTIONS.length;
-
-      onFinish(avg >= MATCH_THRESHOLD);
+      // ✅ TODO MUNDO DÁ MATCH
+      onFinish(true);
       return;
     }
 
@@ -90,6 +84,7 @@ export default function Quiz({ onFinish }: QuizProps) {
                 >
                   {selectedOption === i ? "✓" : ""}
                 </span>
+
                 <span className="text-marrom-escuro font-medium text-sm sm:text-base">
                   {opt.label}
                 </span>
