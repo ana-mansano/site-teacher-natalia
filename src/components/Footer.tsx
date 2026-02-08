@@ -16,7 +16,7 @@ export default function Footer() {
     >
       <div className="max-w-4xl mx-auto">
         <p className="text-off-white font-semibold text-center mb-2 text-lg">
-          Teacher Natalia | Contato pela DM ou link
+          Teacher Natalia
         </p>
         <p className="text-off-white/80 text-center text-sm mb-6">
           Get in touch

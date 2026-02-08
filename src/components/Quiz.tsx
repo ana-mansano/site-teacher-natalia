@@ -13,66 +13,70 @@ export default function Quiz({ onFinish }: QuizProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<number[]>([]);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
+
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const question = QUIZ_QUESTIONS[currentIndex];
   const isLastQuestion = currentIndex === QUIZ_QUESTIONS.length - 1;
   const isFirstQuestion = currentIndex === 0;
 
+  const clearAutoAdvance = () => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+  };
+
   const advance = () => {
     if (selectedOption === null) return;
-    const newAnswers = [...answers, selectedOption];
+
+    const newAnswers = [...answers];
+    newAnswers[currentIndex] = selectedOption;
     setAnswers(newAnswers);
 
     if (isLastQuestion) {
-      const scores = newAnswers.map((optIdx, i) => QUIZ_QUESTIONS[i].options[optIdx].score);
-      const avg = scores.reduce((a, b) => a + b, 0) / QUIZ_QUESTIONS.length;
+      const scores = newAnswers.map(
+        (optIdx, i) => QUIZ_QUESTIONS[i].options[optIdx].score
+      );
+      const avg =
+        scores.reduce((a, b) => a + b, 0) / QUIZ_QUESTIONS.length;
+
       onFinish(avg >= MATCH_THRESHOLD);
       return;
     }
 
     setCurrentIndex((i) => i + 1);
-    setSelectedOption(null);
+    setSelectedOption(newAnswers[currentIndex + 1] ?? null);
   };
 
   const goBack = () => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-      timeoutRef.current = null;
-    }
+    clearAutoAdvance();
     if (currentIndex === 0) return;
-    const previousSelected = answers[answers.length - 1];
-    setAnswers(answers.slice(0, -1));
+
     setCurrentIndex((i) => i - 1);
-    setSelectedOption(previousSelected);
+    setSelectedOption(answers[currentIndex - 1] ?? null);
   };
 
   const handleSelect = (optionIndex: number) => {
-    if (selectedOption !== null) return;
     setSelectedOption(optionIndex);
 
-    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    clearAutoAdvance();
     timeoutRef.current = setTimeout(advance, AUTO_ADVANCE_MS);
   };
 
   const handleNext = () => {
-    if (selectedOption === null) return;
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-      timeoutRef.current = null;
-    }
+    clearAutoAdvance();
     advance();
   };
 
-
   useEffect(() => {
-    return () => {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    };
+    return () => clearAutoAdvance();
   }, []);
 
   const progress =
-    ((currentIndex + (selectedOption !== null ? 1 : 0)) / QUIZ_QUESTIONS.length) * 100;
+    ((currentIndex + (selectedOption !== null ? 1 : 0)) /
+      QUIZ_QUESTIONS.length) *
+    100;
 
   return (
     <section
@@ -83,6 +87,7 @@ export default function Quiz({ onFinish }: QuizProps) {
         <p className="text-marrom-medio text-center mb-2 text-sm font-medium">
           Pergunta {currentIndex + 1} de {QUIZ_QUESTIONS.length}
         </p>
+
         <div className="h-1.5 sm:h-2 bg-rosa-claro rounded-full overflow-hidden mb-6 sm:mb-8">
           <div
             className="h-full bg-rosa-destaque rounded-full transition-all duration-300"
@@ -100,10 +105,8 @@ export default function Quiz({ onFinish }: QuizProps) {
               <button
                 type="button"
                 onClick={() => handleSelect(i)}
-                disabled={selectedOption !== null}
-                className={`quiz-option w-full text-left flex items-center gap-3 min-h-[48px] sm:min-h-[52px] ${
-                  selectedOption === i ? "selected" : ""
-                } ${selectedOption !== null && selectedOption !== i ? "opacity-70" : ""}`}
+                className={`quiz-option w-full text-left flex items-center gap-3 min-h-[48px] sm:min-h-[52px]
+                ${selectedOption === i ? "selected" : ""}`}
               >
                 <span
                   className={`flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 flex items-center justify-center text-xs sm:text-sm ${
@@ -132,11 +135,12 @@ export default function Quiz({ onFinish }: QuizProps) {
               Anterior
             </button>
           )}
+
           <button
             type="button"
             onClick={handleNext}
             disabled={selectedOption === null}
-            className="btn-primary min-h-[44px] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-sm sm:text-base"
+            className="btn-primary min-h-[44px] disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
           >
             {isLastQuestion ? "Ver resultado" : "Próxima"}
           </button>
