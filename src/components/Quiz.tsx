@@ -1,43 +1,36 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import { QUIZ_QUESTIONS, MATCH_THRESHOLD } from "@/data/quiz";
 
 type QuizProps = {
   onFinish: (isMatch: boolean) => void;
 };
 
-const AUTO_ADVANCE_MS = 550;
-
 export default function Quiz({ onFinish }: QuizProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<number[]>([]);
-  const [selectedOption, setSelectedOption] = useState<number | null>(null);
-
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const question = QUIZ_QUESTIONS[currentIndex];
   const isLastQuestion = currentIndex === QUIZ_QUESTIONS.length - 1;
   const isFirstQuestion = currentIndex === 0;
 
-  const clearAutoAdvance = () => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-      timeoutRef.current = null;
-    }
+  const selectedOption = answers[currentIndex] ?? null;
+
+  const handleSelect = (optionIndex: number) => {
+    const newAnswers = [...answers];
+    newAnswers[currentIndex] = optionIndex;
+    setAnswers(newAnswers);
   };
 
-  const advance = () => {
+  const handleNext = () => {
     if (selectedOption === null) return;
 
-    const newAnswers = [...answers];
-    newAnswers[currentIndex] = selectedOption;
-    setAnswers(newAnswers);
-
     if (isLastQuestion) {
-      const scores = newAnswers.map(
+      const scores = answers.map(
         (optIdx, i) => QUIZ_QUESTIONS[i].options[optIdx].score
       );
+
       const avg =
         scores.reduce((a, b) => a + b, 0) / QUIZ_QUESTIONS.length;
 
@@ -46,32 +39,12 @@ export default function Quiz({ onFinish }: QuizProps) {
     }
 
     setCurrentIndex((i) => i + 1);
-    setSelectedOption(newAnswers[currentIndex + 1] ?? null);
   };
 
   const goBack = () => {
-    clearAutoAdvance();
-    if (currentIndex === 0) return;
-
+    if (isFirstQuestion) return;
     setCurrentIndex((i) => i - 1);
-    setSelectedOption(answers[currentIndex - 1] ?? null);
   };
-
-  const handleSelect = (optionIndex: number) => {
-    setSelectedOption(optionIndex);
-
-    clearAutoAdvance();
-    timeoutRef.current = setTimeout(advance, AUTO_ADVANCE_MS);
-  };
-
-  const handleNext = () => {
-    clearAutoAdvance();
-    advance();
-  };
-
-  useEffect(() => {
-    return () => clearAutoAdvance();
-  }, []);
 
   const progress =
     ((currentIndex + (selectedOption !== null ? 1 : 0)) /
